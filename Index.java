@@ -14,3 +14,9 @@ class PricePoint {
         this.price = price;
         this.volume = volume;
     }
+    
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public String getSymbol() { return symbol; }
+    public double getPrice() { return price; }
+    public long getVolume() { return volume; }
+}
