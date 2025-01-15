@@ -20,3 +20,16 @@ class PricePoint {
     public double getPrice() { return price; }
     public long getVolume() { return volume; }
 }
+interface TradingStrategy {
+    boolean shouldBuy(Queue<PricePoint> priceHistory);
+    boolean shouldSell(Queue<PricePoint> priceHistory);
+}
+
+class MovingAverageCrossoverStrategy implements TradingStrategy {
+    private final int shortTermPeriod;
+    private final int longTermPeriod;
+
+    public MovingAverageCrossoverStrategy(int shortTermPeriod, int longTermPeriod) {
+        this.shortTermPeriod = shortTermPeriod;
+        this.longTermPeriod = longTermPeriod;
+    }
