@@ -33,3 +33,22 @@ class MovingAverageCrossoverStrategy implements TradingStrategy {
         this.shortTermPeriod = shortTermPeriod;
         this.longTermPeriod = longTermPeriod;
     }
+    @Override
+    public boolean shouldBuy(Queue<PricePoint> priceHistory) {
+        if (priceHistory.size() < longTermPeriod) return false;
+        
+        double shortTermMA = calculateMA(priceHistory, shortTermPeriod);
+        double longTermMA = calculateMA(priceHistory, longTermPeriod);
+        
+        return shortTermMA > longTermMA;
+    }
+
+    @Override
+    public boolean shouldSell(Queue<PricePoint> priceHistory) {
+        if (priceHistory.size() < longTermPeriod) return false;
+        
+        double shortTermMA = calculateMA(priceHistory, shortTermPeriod);
+        double longTermMA = calculateMA(priceHistory, longTermPeriod);
+        
+        return shortTermMA < longTermMA;
+    }
