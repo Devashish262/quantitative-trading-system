@@ -52,3 +52,13 @@ class MovingAverageCrossoverStrategy implements TradingStrategy {
         
         return shortTermMA < longTermMA;
     }
+    private double calculateMA(Queue<PricePoint> priceHistory, int period) {
+        List<PricePoint> recentPrices = new ArrayList<>(priceHistory);
+        int startIndex = Math.max(0, recentPrices.size() - period);
+        
+        return recentPrices.subList(startIndex, recentPrices.size()).stream()
+                .mapToDouble(PricePoint::getPrice)
+                .average()
+                .orElse(0.0);
+    }
+}
