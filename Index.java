@@ -62,3 +62,82 @@ class MovingAverageCrossoverStrategy implements TradingStrategy {
                 .orElse(0.0);
     }
 }
+class TradingSystem {
+    private final Map<String, Queue<PricePoint>> priceHistory;
+    private final Map<String, TradingStrategy> strategies;
+    private final int maxHistorySize;
+    private final Map<String, Position> positions;
+
+    public TradingSystem(int maxHistorySize) {
+        this.maxHistorySize = maxHistorySize;
+        this.priceHistory = new HashMap<>();
+        this.strategies = new HashMap<>();
+        this.positions = new HashMap<>();
+    }
+
+    public void addPricePoint(PricePoint pricePoint) {
+        String symbol = pricePoint.getSymbol();
+        priceHistory.computeIfAbsent(symbol, k -> new LinkedBlockingQueue<>());
+        
+        Queue<PricePoint> symbolHistory = priceHistory.get(symbol);
+        symbolHistory.add(pricePoint);
+        
+        while (symbolHistory.size() > maxHistorySize) {
+            symbolHistory.poll();
+        }
+        
+        analyzeTrades(symbol);
+    }
+
+    public void setStrategy(String symbol, TradingStrategy strategy) {
+        strategies.put(symbol, strategy);
+    }
+
+    private void analyzeTrades(String symbol) {
+        TradingStrategy strategy = strategies.get(symbol);
+        if (strategy == null) return;
+
+        Queue<PricePoint> symbolHistory = priceHistory.get(symbol);
+        Position currentPosition = positions.getOrDefault(symbol, new Position(symbol));
+
+        if (currentPosition.getQuantity() == 0 && strategy.shouldBuy(symbolHistory)) {
+            executeBuy(symbol, calculatePositionSize(symbol));
+        } else if (currentPosition.getQuantity() > 0 && strategy.shouldSell(symbolHistory)) {
+            executeSell(symbol, currentPosition.getQuantity());
+        }
+    }
+
+    private void executeBuy(String symbol, int quantity) {
+        PricePoint latestPrice = getLatestPrice(symbol);
+        if (latestPrice == null) return;
+
+        Position position = positions.getOrDefault(symbol, new Position(symbol));
+        position.buy(quantity, latestPrice.getPrice());
+        positions.put(symbol, position);
+        
+        System.out.printf("Executed BUY: %s, Quantity: %d, Price: %.2f%n", 
+            symbol, quantity, latestPrice.getPrice());
+    }
+
+    private void executeSell(String symbol, int quantity) {
+        PricePoint latestPrice = getLatestPrice(symbol);
+        if (latestPrice == null) return;
+
+        Position position = positions.get(symbol);
+        if (position != null) {
+            position.sell(quantity, latestPrice.getPrice());
+            System.out.printf("Executed SELL: %s, Quantity: %d, Price: %.2f%n", 
+                symbol, quantity, latestPrice.getPrice());
+        }
+    }
+
+    private PricePoint getLatestPrice(String symbol) {
+        Queue<PricePoint> symbolHistory = priceHistory.get(symbol);
+        return symbolHistory != null && !symbolHistory.isEmpty() ? 
+            ((LinkedList<PricePoint>)symbolHistory).getLast() : null;
+    }
+
+    private int calculatePositionSize(String symbol) {
+        return 100;
+    }
+}
