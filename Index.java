@@ -141,3 +141,15 @@ class TradingSystem {
         return 100;
     }
 }
+class Position {
+    private final String symbol;
+    private int quantity;
+    private double averagePrice;
+    private double totalPnL;
+
+    public Position(String symbol) {
+        this.symbol = symbol;
+        this.quantity = 0;
+        this.averagePrice = 0.0;
+        this.totalPnL = 0.0;
+    }
