@@ -153,3 +153,18 @@ class Position {
         this.averagePrice = 0.0;
         this.totalPnL = 0.0;
     }
+    
+      public void buy(int quantity, double price) {
+        if (this.quantity > 0) {
+            this.averagePrice = ((this.averagePrice * this.quantity) + (price * quantity)) 
+                / (this.quantity + quantity);
+        } else {
+            this.averagePrice = price;
+        }
+        this.quantity += quantity;
+    }
+
+    public void sell(int quantity, double price) {
+        if (quantity > this.quantity) {
+            quantity = this.quantity;
+        }
