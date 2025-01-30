@@ -168,3 +168,16 @@ class Position {
         if (quantity > this.quantity) {
             quantity = this.quantity;
         }
+         double pnL = (price - averagePrice) * quantity;
+        totalPnL += pnL;
+        this.quantity -= quantity;
+        
+        if (this.quantity == 0) {
+            this.averagePrice = 0.0;
+        }
+    }
+
+    public int getQuantity() { return quantity; }
+    public double getAveragePrice() { return averagePrice; }
+    public double getTotalPnL() { return totalPnL; }
+}
