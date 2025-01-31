@@ -181,3 +181,21 @@ class Position {
     public double getAveragePrice() { return averagePrice; }
     public double getTotalPnL() { return totalPnL; }
 }
+public class StockTradingDemo {
+    public static void main(String[] args) {
+        TradingSystem tradingSystem = new TradingSystem(100);
+        tradingSystem.setStrategy("AAPL", new MovingAverageCrossoverStrategy(10, 30));
+        
+        LocalDateTime now = LocalDateTime.now();
+        for (int i = 0; i < 50; i++) {
+            double price = 150.0 + Math.sin(i * 0.1) * 10;
+            PricePoint pricePoint = new PricePoint(
+                now.plusMinutes(i),
+                "AAPL",
+                price,
+                1000L
+            );
+            tradingSystem.addPricePoint(pricePoint);
+        }
+    }
+}
